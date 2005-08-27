@@ -32,12 +32,6 @@ import net.java.games.util.plugins.Plugin;
  */
 public class LinuxEnvironmentPlugin extends ControllerEnvironment implements Plugin {
     
-    static {
-        if(isSupported()) {
-            System.loadLibrary("jinput-linux");
-        }
-    }    
-
     /** List of controllers
      */    
     private Controller[] controllers;
@@ -46,7 +40,7 @@ public class LinuxEnvironmentPlugin extends ControllerEnvironment implements Plu
     public LinuxEnvironmentPlugin() {
         if(isSupported()) {
 	        LinuxNativeTypesMap.init();
-	        init();
+	        EventInterface.eventInit();
 	        createControllers();
         } else {
             controllers = new Controller[0];
@@ -75,7 +69,7 @@ public class LinuxEnvironmentPlugin extends ControllerEnvironment implements Plu
     /** Create the controllers
      */    
     private void createControllers() {
-        int numDevices = getNumberOfDevices();
+        int numDevices = EventInterface.getNumDevices();
         
         Controller[] tempControllers = new Controller[numDevices];
         
@@ -103,10 +97,10 @@ public class LinuxEnvironmentPlugin extends ControllerEnvironment implements Plu
      * @return The new device
      */    
     private Controller createDevice(int deviceNumber) {
-        String name = getDeviceName(deviceNumber);
-        int numAbsAxes = getNumAbsAxes(deviceNumber);
-        int numRelAxes = getNumRelAxes(deviceNumber);
-        int numButtons = getNumButtons(deviceNumber);
+        String name = EventInterface.getName(deviceNumber);
+        int numAbsAxes = EventInterface.getNumberAbsAxes(deviceNumber);
+        int numRelAxes = EventInterface.getNumberRelAxes(deviceNumber);
+        int numButtons = EventInterface.getNumberButtons(deviceNumber);
         Controller device = null;
         
         int mouseCharacteristic = 0;
@@ -152,34 +146,5 @@ public class LinuxEnvironmentPlugin extends ControllerEnvironment implements Plu
         }
         return device;
     }
-    
-    /** Get the name of a device from the native library
-     * @param deviceID The device id
-     * @return The devices name
-     */    
-    private native String getDeviceName(int deviceID);
-    /** Get the number of absolute axes for the requested device
-     * @param deviceID The device ID
-     * @return The number of abs axes
-     */    
-    private native int getNumAbsAxes(int deviceID);
-    /** Get the nmber or relative axes from the native library
-     * @param deviceID The native device ID
-     * @return The number of raltive axes for the device
-     */    
-    private native int getNumRelAxes(int deviceID);
-    /** Gets the number of buttons for the requested devce from the native library
-     * @param deviceID The device ID
-     * @return The number of buttons
-     */    
-    private native int getNumButtons(int deviceID);
-    /** Initialises the native library
-     * @return <0 if something went wrong
-     */    
-    private native int init();
-    /** Gets the number of devices the native library found
-     * @return Th number of devices
-     */    
-    private native int getNumberOfDevices();
-    
+       
 }

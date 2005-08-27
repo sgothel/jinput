@@ -18,7 +18,7 @@ public class LinuxDeviceRumbler implements Rumbler {
 
 	public void rumble(float intensity) {
 		// TODO Auto-generated method stub
-		nativeRumble(deviceID, intensity);
+		EventInterface.rumble(deviceID, intensity);
 	}
 
 	public String getAxisName() {
@@ -32,11 +32,13 @@ public class LinuxDeviceRumbler implements Rumbler {
 	}
 
 	private void cleanup() {
-		nativeCleanup(deviceID);
+        System.out.println("LinuxDeviceRumbler.cleanup");
+        rumble(0f);
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            //ignore
+        }
+		EventInterface.cleanup(deviceID);
 	}
-
-	private native void nativeRumble(int deviceID, float intensity);
-	
-	private native void nativeCleanup(int deviceID);
-	
 }

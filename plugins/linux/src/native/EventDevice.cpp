@@ -83,6 +83,7 @@ EventDevice::EventDevice(char *deviceFileName) {
 		  if (ioctl(fd, EVIOCSFF, &effect) == -1) {
 		    perror("Upload effect");
 		  }
+		  LOG_TRACE("Uploaded effect to id %d\n", effect.id);
 	    
 	      
 	  } else {
@@ -243,21 +244,24 @@ int EventDevice::isValidDevice() {
 
 int EventDevice::getNumberRelAxes(){
   if(inited!=1) return -1;
+  LOG_TRACE("EventDevice::getNumberRelAxes (%s) %d\n", name, numRelAxes);
   return numRelAxes;
 }
 
 int EventDevice::getNumberAbsAxes(){
   if(inited!=1) return -1;
+  LOG_TRACE("EventDevice::getNumberAbsAxes (%s) %d\n", name, numAbsAxes);
   return numAbsAxes;
 }
 
 int EventDevice::getNumberButtons(){
   if(inited!=1) return -1;
+  LOG_TRACE("EventDevice::getNumberButtons (%s) %d\n", name, numButtons);
   return numButtons;
 }
 
 const char *EventDevice::getName(){ 
-  LOG_TRACE("EventDevice::getName()\n");
+  LOG_TRACE("EventDevice::getName() %s\n", name);
   return name;
 }
 
@@ -284,6 +288,7 @@ int EventDevice::getVersion(){
 void EventDevice::getSupportedRelAxes(int supportedAxis[]){
   int i;
 
+  //LOG_TRACE("EventDevice::getSupportedRelAxes\n");
   if(inited!=1) return;
   for(i=0;i<numRelAxes; i++) {
     (supportedAxis)[i] = supportedRelAxes[i];
@@ -318,6 +323,7 @@ int EventDevice::poll(){
   int dataChanged=0;
 
   if(inited!=1) return -1;
+  //LOG_TRACE("EventDevice::poll inited (%s)\n",name);
 
   // first thing to do is reset all relative axis as mice never seem to do it
   int i;
@@ -392,13 +398,17 @@ void EventDevice::getPolledData(int relAxesData[], int absAxesData[], int button
   int i;
 
   if(inited!=1) return;
+  //LOG_TRACE("EventDevice::getPolledData inited (%s)\n",name);
   for(i=0;i<numRelAxes;i++) {
+	//LOG_TRACE("EventDevice::getPolledData rel axis %d\n",i);
     (relAxesData)[i] = this->relAxesData[i];
   }
   for(i=0;i<numAbsAxes;i++) {
+	//LOG_TRACE("EventDevice::getPolledData abs axis %d\n",i);
     (absAxesData)[i] = this->absAxesData[i];
   }
   for(i=0;i<numButtons;i++) {
+	//LOG_TRACE("EventDevice::getPolledData button %d\n",i);
     (buttonData)[i] = this->buttonData[i];
   }
 }
@@ -425,11 +435,11 @@ bool EventDevice::getFFEnabled() {
 }
 
 void EventDevice::rumble(float force) {
+	if(force<0) force=-force;
 	if(force>1) force=1;
-	if(force<-1) force=-1;
 	//LOG_TRACE("Rumbling at %d%%, (shh, pretend)\n", (int)(force*100));
 	
-	if(effect_playing==true && force==0) {
+	if(effect_playing==true) {
 		stop.type=EV_FF;
 		stop.code = effect.id;
 		stop.value=0;
@@ -441,6 +451,24 @@ void EventDevice::rumble(float force) {
 	    }
 	}
 	if(effect_playing==false && force!=0) {
+		if(force>=0.666) {
+			effect.u.rumble.strong_magnitude = (int)(0x8000*force);
+			effect.u.rumble.weak_magnitude = (int)(0xc000*force);
+		} else if(force>=0.333) {
+			effect.u.rumble.strong_magnitude = (int)(0x8000*force);
+			effect.u.rumble.weak_magnitude = (int)(0xc000*0);
+		} else {
+			effect.u.rumble.strong_magnitude = (int)(0x8000*0);
+			effect.u.rumble.weak_magnitude = (int)(0xc000*force);
+		}
+		
+		LOG_TRACE("Setting strong_mag to 0x%x, and weak_mag to 0x%x\n", effect.u.rumble.strong_magnitude, effect.u.rumble.weak_magnitude);
+		
+		LOG_TRACE("Uploading effect %d\n", effect.id);
+		if (ioctl(fd, EVIOCSFF, &effect) == -1) {
+			perror("Upload effect");
+		}
+		
 	    play.type = EV_FF;
 	    play.code=effect.id;
 	    play.value=1;
