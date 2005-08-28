@@ -34,11 +34,5 @@ public class LinuxDeviceRumbler implements Rumbler {
 	private void cleanup() {
         System.out.println("LinuxDeviceRumbler.cleanup");
         rumble(0f);
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            //ignore
-        }
-		EventInterface.cleanup(deviceID);
 	}
 }

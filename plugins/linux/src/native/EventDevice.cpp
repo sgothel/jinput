@@ -384,6 +384,9 @@ int EventDevice::poll(){
         //printf("abs axis %d translates to abs axis %d on this device\n", events[i].code, axisIndex);
         break;
       }
+      case EV_FF:
+      	LOG_TRACE("Got event EV_FF code %d value %d\n",events[i].code, events[i].value);
+      	break;
       case EV_LED:
         // reveiced for things like numlock led change
         break;

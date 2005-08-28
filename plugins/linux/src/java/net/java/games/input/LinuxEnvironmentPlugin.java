@@ -39,6 +39,12 @@ public class LinuxEnvironmentPlugin extends ControllerEnvironment implements Plu
     /** Creates a new instance of LinuxEnvironmentPlugin */
     public LinuxEnvironmentPlugin() {
         if(isSupported()) {
+            Runtime.runFinalizersOnExit(true);
+            /*Runtime.getRuntime().addShutdownHook(new Thread() {
+               public void run() {
+                   cleanup(); 
+               }
+            });*/
 	        LinuxNativeTypesMap.init();
 	        EventInterface.eventInit();
 	        createControllers();
@@ -145,6 +151,29 @@ public class LinuxEnvironmentPlugin extends ControllerEnvironment implements Plu
             device = new LinuxDevice(deviceNumber, name, numButtons, numRelAxes, numAbsAxes);
         }
         return device;
+    }
+    
+    public static void cleanup() {
+        //Give the rumblers chance to cleanup
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        System.out.println("Environment cleanup");
+        for(int i=0;i<EventInterface.getNumDevices();i++) {
+            EventInterface.cleanup(i);
+        }
+    }
+    
+    protected void finalize() throws Throwable {
+        // TODO Auto-generated method stub
+        System.out.println("Environment finalize");
+        for(int i=0;i<EventInterface.getNumDevices();i++) {
+            EventInterface.cleanup(i);
+        }
+        super.finalize();
     }
        
 }

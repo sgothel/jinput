@@ -1,12 +1,43 @@
 package net.java.games.input;
 
+import java.util.ArrayList;
+
 public class EventInterfaceTest {
 
-    public static void main(String args[]) {
-        EventInterface.eventInit();
-        int numDevices = EventInterface.getNumDevices();
+    public EventInterfaceTest() {
+        //EventInterface.eventInit();
+        //int numDevices = EventInterface.getNumDevices();
         
-        for(int i=0;i<numDevices;i++) {
+        Controller[] controllers = DefaultControllerEnvironment.getDefaultEnvironment().getControllers();
+        ArrayList rumblers = new ArrayList();
+        
+        for(int i=0;i<controllers.length;i++) {
+            Rumbler[] tempRumblers = controllers[i].getRumblers();
+            for (int j=0;j<tempRumblers.length;j++) {
+                rumblers.add(tempRumblers[j]);
+            }
+        }
+        
+        for(int i=0;i<rumblers.size();i++) {
+            Rumbler rumbler = (Rumbler)rumblers.get(i);
+            rumbler.getAxisName();
+            rumbler.rumble(1f);
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            rumbler.rumble(0f);
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+        
+        /*for(int i=0;i<numDevices;i++) {
             System.out.println("Device name: " + EventInterface.getName(i));
             if(EventInterface.getFFEnabled(i)) {
                 try {
@@ -35,7 +66,7 @@ public class EventInterfaceTest {
                     int absAxisData[] = new int[numAbsAxis];
                     int relAxisData[] = new int[numRelAxis];
                     int buttonData[] = new int[numButtons];
-                    EventInterface.getPolledData(i, relAxisData, absAxisData, buttonData);
+                    //EventInterface.getPolledData(i, relAxisData, absAxisData, buttonData);
                     
                     EventInterface.rumble(i,0.2f);
                     Thread.sleep(1000);
@@ -46,7 +77,17 @@ public class EventInterfaceTest {
                 
                 }
             }
-        }
+        }*/
+        
+        /*for(int i=0;i<EventInterface.getNumDevices();i++) {
+            EventInterface.cleanup(i);
+        }*/
+        
+        LinuxEnvironmentPlugin.cleanup();
+    }
+    
+    public static void main(String args[]) {
+        new EventInterfaceTest();
     }
 }
 
