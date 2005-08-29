@@ -35,19 +35,67 @@ public class LinuxEnvironmentPlugin extends ControllerEnvironment implements Plu
     /** List of controllers
      */    
     private Controller[] controllers;
+    private static Object workerThreadMonitor = new Object();
+    private static boolean shutdown = false;
+    private static Object shutdownThreadMonitor = new Object();
+    private static boolean cleanupDone = false;
+    private static int rumbler;
+    private static float force;
     
     /** Creates a new instance of LinuxEnvironmentPlugin */
     public LinuxEnvironmentPlugin() {
         if(isSupported()) {
-            Runtime.runFinalizersOnExit(true);
-            /*Runtime.getRuntime().addShutdownHook(new Thread() {
-               public void run() {
-                   cleanup(); 
-               }
-            });*/
-	        LinuxNativeTypesMap.init();
-	        EventInterface.eventInit();
-	        createControllers();
+            
+            LinuxNativeTypesMap.init();
+            System.out.println("Creating shutdown thread");
+            System.out.flush();
+            Thread initShutdownThread = new Thread() {
+                public void run() {                    
+                    EventInterface.eventInit();
+                    synchronized(workerThreadMonitor) {
+                        while(!shutdown) {
+                            System.out.println("Waiting on monitor");
+                            System.out.flush();
+                            try {
+                                workerThreadMonitor.wait();
+                            } catch (InterruptedException e) {
+                                // TODO Auto-generated catch block
+                                e.printStackTrace();
+                            }
+                            if(rumbler>=0) {
+                                EventInterface.rumble(rumbler,force);
+                            }
+                        }
+                    }
+                    System.out.println("Cleaning up from shutdown thread");
+                    realCleanup();
+                    cleanupDone = true;
+                    synchronized (shutdownThreadMonitor) {
+                        shutdownThreadMonitor.notifyAll();
+                    }
+                }
+            };
+            
+            initShutdownThread.setDaemon(true);
+            initShutdownThread.start();
+            
+            System.out.println("Shutdown thread created and run");
+
+            Runtime.getRuntime().addShutdownHook(new Thread() {
+                public void run() {
+                    cleanup();
+                }
+            });         
+                
+            //Make sure the init thread has got the event interface inited
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            createControllers();
+            System.out.println("Created the controllers");
         } else {
             controllers = new Controller[0];
         }
@@ -153,7 +201,36 @@ public class LinuxEnvironmentPlugin extends ControllerEnvironment implements Plu
         return device;
     }
     
-    public static void cleanup() {
+    private static void cleanup() {
+        shutdown = true;
+        System.out.println("Trying to notify for cleanup");
+        System.out.flush();
+        synchronized (workerThreadMonitor) {
+            System.out.println("Notifying clean up thread");
+            System.out.flush();
+            workerThreadMonitor.notify();
+        }
+        
+        /*try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }*/
+        
+        while(!cleanupDone) {
+            synchronized (shutdownThreadMonitor) {
+                try {
+                    shutdownThreadMonitor.wait();
+                } catch (InterruptedException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+    
+    private void realCleanup() {
         //Give the rumblers chance to cleanup
         try {
             Thread.sleep(1000);
@@ -167,13 +244,13 @@ public class LinuxEnvironmentPlugin extends ControllerEnvironment implements Plu
         }
     }
     
-    protected void finalize() throws Throwable {
-        // TODO Auto-generated method stub
-        System.out.println("Environment finalize");
-        for(int i=0;i<EventInterface.getNumDevices();i++) {
-            EventInterface.cleanup(i);
+    public static void rumble(int rumblerNo, float forceValue) {
+        rumbler = rumblerNo;
+        force = forceValue;
+        synchronized (workerThreadMonitor) {
+            System.out.println("Notifying clean up thread");
+            System.out.flush();
+            workerThreadMonitor.notify();
         }
-        super.finalize();
     }
-       
 }

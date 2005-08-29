@@ -18,7 +18,7 @@ public class LinuxDeviceRumbler implements Rumbler {
 
 	public void rumble(float intensity) {
 		// TODO Auto-generated method stub
-		EventInterface.rumble(deviceID, intensity);
+		LinuxEnvironmentPlugin.rumble(deviceID, intensity);
 	}
 
 	public String getAxisName() {

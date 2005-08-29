@@ -83,7 +83,7 @@ public class EventInterfaceTest {
             EventInterface.cleanup(i);
         }*/
         
-        LinuxEnvironmentPlugin.cleanup();
+        //LinuxEnvironmentPlugin.cleanup();
     }
     
     public static void main(String args[]) {
