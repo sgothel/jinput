@@ -41,6 +41,7 @@ import java.security.PrivilegedAction;
 public final class LinuxEnvironmentPlugin extends ControllerEnvironment implements Plugin {
     private final Controller[] controllers;
 	private final List devices = new ArrayList();
+	private final static LinuxDeviceThread device_thread = new LinuxDeviceThread();
     
 	static {
 		AccessController.doPrivileged(
@@ -50,6 +51,10 @@ public final class LinuxEnvironmentPlugin extends ControllerEnvironment implemen
 						return null;
 					}
 				});
+	}
+
+	public final static Object execute(LinuxDeviceTask task) throws IOException {
+		return device_thread.execute(task);
 	}
 
     public LinuxEnvironmentPlugin() {

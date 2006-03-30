@@ -123,13 +123,13 @@ class DefaultControllerEnvironment extends ControllerEnvironment {
 					pluginClasses = pluginClasses + " net.java.games.input.OSXEnvironmentPlugin";
 				} else if(osName.equals("Windows 98") || osName.equals("Windows 2000") || osName.equals("Windows XP")) {
 					pluginClasses = pluginClasses + " net.java.games.input.DirectInputEnvironmentPlugin";
-					pluginClasses = pluginClasses + " net.java.games.input.RawInputEnvironmentPlugin";
+//					pluginClasses = pluginClasses + " net.java.games.input.RawInputEnvironmentPlugin";
 				} else if (osName.startsWith("Windows")) {
 					System.out.println("WARNING: Found unknown Windows version: " + osName);
 					System.out.println("Attempting to use default windows plug-in.");
 					System.out.flush();
 					pluginClasses = pluginClasses + " net.java.games.input.DirectInputEnvironmentPlugin";
-					pluginClasses = pluginClasses + " net.java.games.input.RawInputEnvironmentPlugin";
+//					pluginClasses = pluginClasses + " net.java.games.input.RawInputEnvironmentPlugin";
 				} else {
 					System.out.println("Trying to use default plugin, OS name " + osName +" not recognised");
 				}

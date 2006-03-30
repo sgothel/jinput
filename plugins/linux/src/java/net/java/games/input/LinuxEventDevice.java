@@ -369,20 +369,16 @@ final class LinuxEventDevice implements LinuxDevice {
 	}
 	private final static native String nGetName(long fd) throws IOException;
 
-	public final synchronized void close() throws IOException {
-		if (!closed) {
-			try {
-				if (rumblers != null)
-					for (int i = 0; i < rumblers.length; i++) {
-						rumblers[i].rumble(0);
-						// erasing effects seems to be unsupported on logitech devices
-						//rumblers[i].erase();
-					}
-			} finally {
-				closed = true;
+	public synchronized final void close() throws IOException {
+		if (closed)
+			return;
+		closed = true;
+		LinuxEnvironmentPlugin.execute(new LinuxDeviceTask() {
+			protected final Object execute() throws IOException {
 				nClose(fd);
+				return null;
 			}
-		}
+		});
 	}
 	private final static native void nClose(long fd) throws IOException;
 

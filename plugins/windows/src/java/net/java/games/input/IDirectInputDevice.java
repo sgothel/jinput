@@ -250,11 +250,11 @@ final class IDirectInputDevice {
 
 	private final List createRumblers() throws IOException {
 		DIDeviceObject x_axis = lookupObjectByGUID(GUID_XAxis);
-		DIDeviceObject y_axis = lookupObjectByGUID(GUID_YAxis);
-		if(x_axis == null || y_axis == null)
+//		DIDeviceObject y_axis = lookupObjectByGUID(GUID_YAxis);
+		if(x_axis == null/* || y_axis == null*/)
 			return rumblers;
-		DIDeviceObject[] axes = {x_axis, y_axis};
-		long[] directions = {0, 0};
+		DIDeviceObject[] axes = {x_axis/*, y_axis*/};
+		long[] directions = {0/*, 0*/};
 		for (int i = 0; i < effects.size(); i++) {
 			DIEffectInfo info = (DIEffectInfo)effects.get(i);
 			if ((info.getEffectType() & 0xff) == DIEFT_PERIODIC &&
@@ -270,7 +270,7 @@ final class IDirectInputDevice {
 		for (int i = 0; i < axis_ids.length; i++) {
 			axis_ids[i] = axes[i].getDIIdentifier();
 		}
-		long effect_address = nCreatePeriodicEffect(address, info.getGUID(), DIEFF_CARTESIAN | DIEFF_OBJECTIDS, INFINITE, 0, 0, DIEB_NOTRIGGER, 0, axis_ids, directions, 0, 0, 0, 0, DI_FFNOMINALMAX, 0, 0, 50000, 0);
+		long effect_address = nCreatePeriodicEffect(address, info.getGUID(), DIEFF_CARTESIAN | DIEFF_OBJECTIDS, INFINITE, 0, DI_FFNOMINALMAX, DIEB_NOTRIGGER, 0, axis_ids, directions, 0, 0, 0, 0, DI_FFNOMINALMAX, 0, 0, 50000, 0);
 		return new IDirectInputEffect(effect_address, info);
 	}
 	private final static native long nCreatePeriodicEffect(long address, byte[] effect_guid, int flags, int duration, int sample_period, int gain, int trigger_button,  int trigger_repeat_interval, int[] axis_ids, long[] directions, int envelope_attack_level, int envelope_attack_time, int envelope_fade_level, int envelope_fade_time, int periodic_magnitude, int periodic_offset, int periodic_phase, int periodic_period, int start_delay) throws IOException;

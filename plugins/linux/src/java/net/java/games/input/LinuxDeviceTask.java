@@ -27,28 +27,36 @@ package net.java.games.input;
 
 import java.io.IOException;
 
-/**
- * @author elias
- */
-final class LinuxRumbleFF extends LinuxForceFeedbackEffect {
-    public LinuxRumbleFF(LinuxEventDevice device) throws IOException {
-		super(device);
-    }
-
-	protected final int upload(int id, float intensity) throws IOException {
-		int weak_magnitude;
-		int strong_magnitude;
-		if (intensity > 0.666666f) {
-			strong_magnitude = (int)(0x8000*intensity);
-			weak_magnitude = (int)(0xc000*intensity);
-		} else if (intensity > 0.3333333f) {
-			strong_magnitude = (int)(0x8000*intensity);
-			weak_magnitude = (int)(0xc000*0);
-		} else {
-			strong_magnitude = (int)(0x8000*0);
-			weak_magnitude = (int)(0xc000*intensity);
+abstract class LinuxDeviceTask {
+	public final static int INPROGRESS = 1;
+	public final static int COMPLETED = 2;
+	public final static int FAILED = 3;
+	
+	private Object result;
+	private IOException exception;
+	private int state = INPROGRESS;
+	
+	public final void doExecute() {
+		try {
+			result = execute();
+			state = COMPLETED;
+		} catch (IOException e) {
+			exception = e;
+			state = FAILED;
 		}
-
-		return getDevice().uploadRumbleEffect(id, 0, 0, 0, -1, 0, strong_magnitude, weak_magnitude);
 	}
+
+	public final IOException getException() {
+		return exception;
+	}
+
+	public final Object getResult() {
+		return result;
+	}
+
+	public final int getState() {
+		return state;
+	}
+	
+	protected abstract Object execute() throws IOException;
 }

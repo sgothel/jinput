@@ -140,12 +140,16 @@ public final class DirectInputEnvironmentPlugin extends ControllerEnvironment im
 				return createMouseFromDevice(device);
 			case IDirectInputDevice.DI8DEVTYPE_KEYBOARD:
 				return createKeyboardFromDevice(device);
-			case IDirectInputDevice.DI8DEVTYPE_JOYSTICK:
-				return createControllerFromDevice(device, Controller.Type.STICK);
 			case IDirectInputDevice.DI8DEVTYPE_GAMEPAD:
 				return createControllerFromDevice(device, Controller.Type.GAMEPAD);
+			case IDirectInputDevice.DI8DEVTYPE_DRIVING:
+				return createControllerFromDevice(device, Controller.Type.WHEEL);
+			case IDirectInputDevice.DI8DEVTYPE_FLIGHT:
+				/* Fall through */
+			case IDirectInputDevice.DI8DEVTYPE_JOYSTICK:
+				/* Fall through */
 			default:
-				return null;
+				return createControllerFromDevice(device, Controller.Type.STICK);
 		}
 	}
 	

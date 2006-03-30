@@ -26,29 +26,66 @@
 package net.java.games.input;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.ArrayList;
 
 /**
- * @author elias
+ * Linux doesn't have proper support for force feedback
+ * from different threads since it relies on PIDs
+ * to determine ownership of a particular effect slot.
+ * Therefore we have to hack around this by
+ * making sure everything related to FF
+ * (including the final device close that performs
+ *  and implicit deletion of all the process' effects)
+ * is run on a single thread.
  */
-final class LinuxRumbleFF extends LinuxForceFeedbackEffect {
-    public LinuxRumbleFF(LinuxEventDevice device) throws IOException {
-		super(device);
-    }
+final class LinuxDeviceThread extends Thread {
+	private final List tasks = new ArrayList();
+	
+	public LinuxDeviceThread() {
+		setDaemon(true);
+		start();
+	}
 
-	protected final int upload(int id, float intensity) throws IOException {
-		int weak_magnitude;
-		int strong_magnitude;
-		if (intensity > 0.666666f) {
-			strong_magnitude = (int)(0x8000*intensity);
-			weak_magnitude = (int)(0xc000*intensity);
-		} else if (intensity > 0.3333333f) {
-			strong_magnitude = (int)(0x8000*intensity);
-			weak_magnitude = (int)(0xc000*0);
-		} else {
-			strong_magnitude = (int)(0x8000*0);
-			weak_magnitude = (int)(0xc000*intensity);
+	public synchronized final void run() {
+		while (true) {
+			if (!tasks.isEmpty()) {
+				LinuxDeviceTask task = (LinuxDeviceTask)tasks.remove(0);
+				task.doExecute();
+				synchronized (task) {
+					task.notify();
+				}
+			} else {
+				try {
+					wait();
+				} catch (InterruptedException e) {
+					// ignore
+				}
+			}
 		}
+	}
 
-		return getDevice().uploadRumbleEffect(id, 0, 0, 0, -1, 0, strong_magnitude, weak_magnitude);
+	public final Object execute(LinuxDeviceTask task) throws IOException {
+		synchronized (this) {
+			tasks.add(task);
+			notify();
+		}
+		synchronized (task) {
+			while (task.getState() == LinuxDeviceTask.INPROGRESS) {
+				try {
+					task.wait();
+				} catch (InterruptedException e) {
+					// ignore
+				}
+			}
+		}
+		switch (task.getState()) {
+			case LinuxDeviceTask.COMPLETED:
+				return task.getResult();
+			case LinuxDeviceTask.FAILED:
+				throw task.getException();
+			default:
+				throw new RuntimeException("Invalid task state: " + task.getState());
+		}
 	}
 }
