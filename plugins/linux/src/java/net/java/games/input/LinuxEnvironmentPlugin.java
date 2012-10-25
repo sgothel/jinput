@@ -480,6 +480,43 @@ public final class LinuxEnvironmentPlugin extends ControllerEnvironment implemen
 		}
     }
 
+    /**
+     * Attempt to find devices using uinput used for forwarding events.
+     * TODO try to work this out!
+     */
+    /*
+    private final void enumerateUInputControllers(List controllers) {
+		final File dev = new File("/dev/uinput");
+		File[] event_device_files = listFilesPrivileged(dev, new FilenameFilter() {
+			public final boolean accept(File dir, String name) {
+				return name.startsWith("event");
+			}
+		});
+		if (event_device_files == null)
+			return;
+		for (int i = 0; i < event_device_files.length; i++) {
+			File event_file = event_device_files[i];
+			try {
+				String path = getAbsolutePathPrivileged(event_file);
+				LinuxEventDevice device = new LinuxEventDevice(path);
+				try {
+					Controller controller = createControllerFromDevice(device);
+					if (controller != null) {
+						controllers.add(controller);
+						devices.add(device);
+					} else
+						device.close();
+				} catch (IOException e) {
+					logln("Failed to create Controller: " + e.getMessage());
+					device.close();
+				}
+			} catch (IOException e) {
+				logln("Failed to open device (" + event_file + "): " + e.getMessage());
+			}
+		}
+    }
+    */
+
 	private final class ShutdownHook extends Thread {
 		public final void run() {
 			for (int i = 0; i < devices.size(); i++) {
