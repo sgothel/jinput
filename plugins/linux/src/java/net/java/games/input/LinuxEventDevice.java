@@ -25,6 +25,7 @@
  */
 package net.java.games.input;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 import java.util.HashMap;
@@ -52,6 +53,7 @@ final class LinuxEventDevice implements LinuxDevice {
 	 * it doesn't hurt to have multiple threads read/write from/to it
 	 */
 	private final byte[] key_states = new byte[NativeDefinitions.KEY_MAX/8 + 1];
+	private String filename;
 	
     public LinuxEventDevice(String filename) throws IOException {
 		long fd;
@@ -76,6 +78,8 @@ final class LinuxEventDevice implements LinuxDevice {
 			close();
 			throw e;
 		}
+		File file = new File(filename);
+		this.filename = file.getName();
     }
 	private final static native long nOpen(String filename, boolean rw) throws IOException;
 
@@ -335,6 +339,9 @@ final class LinuxEventDevice implements LinuxDevice {
 
 	public final String getName() {
 		return name;
+	}
+	public String getFilename(){
+	    return filename;
 	}
 	
 	private final String getDeviceName() throws IOException {

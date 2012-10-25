@@ -285,4 +285,9 @@ public final class OSXEnvironmentPlugin extends ControllerEnvironment implements
 		controllers.toArray(controllers_array);
 		return controllers_array;
 	}
+
+	@Override
+	public Controller[] rescanControllers() {
+		throw new UnsupportedOperationException("Not supported yet.");
+	}
 }

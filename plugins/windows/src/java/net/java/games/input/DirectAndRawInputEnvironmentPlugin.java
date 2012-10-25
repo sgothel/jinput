@@ -91,4 +91,9 @@ public class DirectAndRawInputEnvironmentPlugin extends ControllerEnvironment {
 		return rawPlugin.isSupported() || dinputPlugin.isSupported();
 	}
 
+	@Override
+	public Controller[] rescanControllers() {
+		throw new UnsupportedOperationException("Not supported yet.");
+	}
+
 }
