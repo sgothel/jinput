@@ -183,4 +183,8 @@ public abstract class Mouse extends AbstractController {
 		return getComponent(Component.Identifier.Button._4);
 	}
 
+	public boolean grab(){ return false; }
+
+	public boolean ungrab(){ return false;}
+
 } // class Mouse

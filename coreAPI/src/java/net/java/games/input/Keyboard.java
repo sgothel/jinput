@@ -66,4 +66,8 @@ public abstract class Keyboard extends AbstractController {
 			return false;
 		return key.getPollData() != 0;
 	}
+
+	public boolean grab(){ return false; }
+
+	public boolean ungrab(){ return false;}
 } // class Keyboard
