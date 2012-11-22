@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 
 <project name="Sun Games Initiative Client Technologies" basedir="." default="all" xmlns:artifact="urn:maven-artifact-ant">
+    <echo message="${os.arch}"/>
 	
 	<property name="api.version" value="2.0.6"/>
 	<property name="mvn.version" value="${api.version}-SNAPSHOT"/>

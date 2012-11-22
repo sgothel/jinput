@@ -235,6 +235,11 @@ public final class DirectInputEnvironmentPlugin extends ControllerEnvironment im
 		return controllers_array;
 	}
 
+	@Override
+	public Controller[] rescanControllers() {
+		throw new UnsupportedOperationException("Not supported yet.");
+	}
+
 	private final class ShutdownHook extends Thread {
 		public final void run() {
 			/* Release the devices to kill off active force feedback effects */

@@ -213,4 +213,9 @@ public final class RawInputEnvironmentPlugin extends ControllerEnvironment imple
 	private final static native byte[] getKeyboardClassGUID();
 	private final static native byte[] getMouseClassGUID();
 
+	@Override
+	public Controller[] rescanControllers() {
+		throw new UnsupportedOperationException("Not supported yet.");
+	}
+
 } // class DirectInputEnvironment

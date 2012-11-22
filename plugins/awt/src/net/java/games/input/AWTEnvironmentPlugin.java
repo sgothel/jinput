@@ -48,4 +48,9 @@ public class AWTEnvironmentPlugin extends ControllerEnvironment implements Plugi
 	public boolean isSupported() {
 		return true;
 	}
+
+	@Override
+	public Controller[] rescanControllers() {
+		throw new UnsupportedOperationException("Not supported yet.");
+	}
 }
