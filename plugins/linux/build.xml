@@ -12,7 +12,7 @@
 
     <target depends="init" name="compile">
 		<!--		<ant dir="src/native" target="createNativeDefinitions.java"/>-->
-        <javac debug="true" deprecation="true" destdir="classes" source="1.4" target="1.4" srcdir="src/java">
+        <javac debug="true" deprecation="true" destdir="classes" source="1.5" target="1.5" srcdir="src/java">
             <classpath>
 				<pathelement location="../../coreAPI/bin/jinput-core.jar"/>
                 <pathelement location="../../lib/jutils.jar"/>
@@ -33,7 +33,7 @@
         <mkdir dir="apidocs"/>
         <javadoc packagenames="net.java.games.input.*" 
                  destdir="apidocs"
-                 additionalparam="-source 1.4"
+                 additionalparam="-source 1.5"
                  link="../../../coreAPI/apidocs">
             <sourcepath>
                 <pathelement location="src/java"/>

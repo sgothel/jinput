@@ -105,9 +105,10 @@ class DefaultControllerEnvironment extends ControllerEnvironment {
     /**
      * List of all controllers in this environment
      */
-    private ArrayList controllers;
+    private ArrayList<Controller> controllers;
     
 	private Collection loadedPlugins = new ArrayList();
+    private ArrayList<ControllerEnvironment> environments = new ArrayList<ControllerEnvironment>();
 
     /**
      * Public no-arg constructor.
@@ -122,7 +123,7 @@ class DefaultControllerEnvironment extends ControllerEnvironment {
     public Controller[] getControllers() {
         if (controllers == null) {
             // Controller list has not been scanned.
-            controllers = new ArrayList();
+            controllers = new ArrayList<Controller>();
             AccessController.doPrivileged(new PrivilegedAction() {
                 public Object run() {
                     scanControllers();
@@ -159,6 +160,7 @@ class DefaultControllerEnvironment extends ControllerEnvironment {
 						Class ceClass = Class.forName(className);						
 						ControllerEnvironment ce = (ControllerEnvironment) ceClass.newInstance();
 						if(ce.isSupported()) {
+							environments.add(ce);
 							addControllers(ce.getControllers());
 							loadedPlugins.add(ce.getClass().getName());
 						} else {
@@ -170,6 +172,65 @@ class DefaultControllerEnvironment extends ControllerEnvironment {
 				}
 			}
         }
+	if(!environments.isEmpty()){
+	    Controller[] newScanControllers = environments.get(0).getControllers();
+            Controller[] ret = new Controller[newScanControllers.length];
+	    for(int i = 0; i < newScanControllers.length; i++){
+                ret[i] = newScanControllers[i];
+            }
+	    return ret;
+	}
+
+        Controller[] ret = new Controller[controllers.size()];
+        Iterator it = controllers.iterator();
+        int i = 0;
+        while (it.hasNext()) {
+            ret[i] = (Controller)it.next();
+            i++;
+        }
+        return ret;
+    }
+
+    /**
+     * Returns a list of all controllers available to this environment,
+     * or an empty array if there are no controllers in this environment.
+     */
+    public Controller[] rescanControllers() {
+	if(!environments.isEmpty()){
+	    Controller[] newScanControllers = environments.get(0).rescanControllers();
+	    // need to add controllers that were connected
+	    for(int i = 0; i < newScanControllers.length; i++){
+		boolean controllerExist = false;
+		for(Controller controller:controllers){
+		    if(newScanControllers[i] == controller){
+			controllerExist = true;
+			break;
+		    }
+		}
+		if(!controllerExist){
+		    controllers.add(newScanControllers[i]);
+		}
+	    }
+	    ArrayList<Controller> removeControllers = new ArrayList<Controller>();
+	    // need to remove controllers that have disconnected
+	    for(Controller controller:controllers){
+		boolean controllerExist = false;
+		for(int i = 0; i < newScanControllers.length; i++){
+		    if(controller == newScanControllers[i]){
+			controllerExist = true;
+			break;
+		    }
+		}
+		if(!controllerExist){
+		    //controllers.remove(controller);
+		    removeControllers.add(controller);
+		}
+	    }
+	    for(Controller controller: removeControllers){
+		controllers.remove(controller);
+	    }
+	}
+
         Controller[] ret = new Controller[controllers.size()];
         Iterator it = controllers.iterator();
         int i = 0;

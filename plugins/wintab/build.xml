@@ -9,11 +9,11 @@
     </target>
 
     <target name="compile" depends="init">
-        <javac srcdir="../windows/src/java" destdir="classes" debug="true" deprecation="true" source="1.4" target="1.4">
+        <javac srcdir="../windows/src/java" destdir="classes" debug="true" deprecation="true" source="1.5" target="1.5">
         	<include name="**/DummyWindow.java"/>
 		</javac>
 
-    	<javac srcdir="src/java" destdir="classes" debug="true" deprecation="true" source="1.4" target="1.4">
+    	<javac srcdir="src/java" destdir="classes" debug="true" deprecation="true" source="1.5" target="1.5">
             <!-- To add something to the classpath: -->
             <classpath>
 				<pathelement location="../../coreAPI/bin/jinput-core.jar"/>
@@ -55,7 +55,7 @@
         <mkdir dir="apidocs"/>
         <javadoc packagenames="net.*" 
                  destdir="apidocs"
-                 additionalparam="-source 1.4">
+                 additionalparam="-source 1.5">
             <sourcepath>
                 <pathelement location="src/java"/>
             </sourcepath>

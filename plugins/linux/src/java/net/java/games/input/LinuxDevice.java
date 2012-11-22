@@ -36,4 +36,7 @@ import java.util.ArrayList;
  */
 interface LinuxDevice {
 	void close() throws IOException;
+	public String getName();
+	public String getFilename();
+
 }

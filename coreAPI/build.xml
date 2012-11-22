@@ -10,7 +10,7 @@
     </target>
 
     <target name="compile" depends="init">
-		<javac srcdir="src/java" destdir="classes" debug="true" deprecation="true" source="1.4" target="1.4">
+		<javac srcdir="src/java" destdir="classes" debug="true" deprecation="true" source="1.5" target="1.5">
 			<include name="net/**"/>
 			<exclude name="**/Version.java"/>
 			<!-- To add something to the classpath: -->
@@ -26,7 +26,7 @@
 				<filter token="API_VERSION" value="${api.version}"/>
 			</filterset>
 		</copy>
-		<javac srcdir="build/src/java" destdir="classes" debug="true" deprecation="true" source="1.4" target="1.4">
+		<javac srcdir="build/src/java" destdir="classes" debug="true" deprecation="true" source="1.5" target="1.5">
 			<include name="net/**" />
 		</javac>
     	<echo message="Build version class for ${api.version} build ${build.number}"/>
@@ -44,7 +44,7 @@
     <target name="javadoc" depends="init" description="Javadoc for my API.">
         <javadoc packagenames="net.java.games.input.*" 
                  destdir="apidocs" 
-                 additionalparam="-source 1.4"
+                 additionalparam="-source 1.5"
 	        	 excludepackagenames="net.java.games.input.example.*,net.java.games.input.test.*">
             <sourcepath>
                 <pathelement location="src/java"/>
