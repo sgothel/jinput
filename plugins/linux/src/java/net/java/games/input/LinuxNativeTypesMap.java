@@ -43,9 +43,9 @@ class LinuxNativeTypesMap {
     /** create an empty, uninitialsed map
      */    
     private LinuxNativeTypesMap() {
-        buttonIDs = new Component.Identifier[NativeDefinitions.KEY_MAX];
-        relAxesIDs = new Component.Identifier[NativeDefinitions.REL_MAX];
-        absAxesIDs = new Component.Identifier[NativeDefinitions.ABS_MAX];
+        buttonIDs = new Component.Identifier[NativeDefinitions.KEY_MAX + 1];
+        relAxesIDs = new Component.Identifier[NativeDefinitions.REL_MAX + 1];
+        absAxesIDs = new Component.Identifier[NativeDefinitions.ABS_MAX + 1];
 		reInit();
     }
     
